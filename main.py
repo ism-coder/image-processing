@@ -3,7 +3,9 @@ from tkinter import filedialog
 
 from PIL import ImageTk, Image
 
-from tools.image_process import *
+from tools import *
+
+currentImage, newImage = "", ""
 
 
 def donothing():
@@ -14,12 +16,13 @@ def donothing():
 
 def openImage():
     global label
-    global imageFile
+    global currentImage
 
-    imageFile = filedialog.askopenfilename(initialdir="~/Pictures", title="Open an image",
+    newImage = filedialog.askopenfilename(initialdir="~/Pictures", title="Open image",
                                            filetypes=(("JPG files", "*.jpg"), ("PNG files", "*.png")))
-
-    img = ImageTk.PhotoImage(Image.open(imageFile))
+    currentImage = newImage
+    openedImage = currentImage
+    img = ImageTk.PhotoImage(Image.open(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -29,16 +32,17 @@ def openImage():
 
 def rotateImage(direction):
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
     angle = 90
 
     if direction == "RIGHT":
         angle *= -1
 
-    image = rotate(cv2.imread(imageFile), angle)
-
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = rotate(cv2.imread(openedImage), angle)
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -48,10 +52,12 @@ def rotateImage(direction):
 
 def binarizeImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = binarize(cv2.imread(imageFile), 128)
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = binarize(cv2.imread(openedImage), 128)
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -61,10 +67,12 @@ def binarizeImage():
 
 def inverseImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = inverse(cv2.imread(imageFile))
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = inverse(cv2.imread(openedImage))
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -74,10 +82,12 @@ def inverseImage():
 
 def adjustConImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = equalizeHist(cv2.imread(imageFile))
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = equalizeHist(cv2.imread(openedImage))
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -87,10 +97,12 @@ def adjustConImage():
 
 def adjustLumImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = stretchHist(cv2.imread(imageFile), 64, 192)
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = stretchHist(cv2.imread(openedImage), 64, 192)
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -100,10 +112,12 @@ def adjustLumImage():
 
 def blurImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = blur(cv2.imread(imageFile))
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = blur(cv2.imread(openedImage))
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -113,10 +127,12 @@ def blurImage():
 
 def edgeImage():
     global label
-    global imageFile
+    global currentImage
+    global openedImage
 
-    image = edge(cv2.imread(imageFile))
-    img = ImageTk.PhotoImage(Image.fromarray(image))
+    newImage = edge(cv2.imread(openedImage))
+    currentImage = newImage
+    img = ImageTk.PhotoImage(Image.fromarray(newImage))
 
     label.pack_forget()
     label = Label(image=img, anchor=CENTER)
@@ -125,14 +141,41 @@ def edgeImage():
 
 
 def showHist():
-    global imageFile
+    global currentImage
 
-    hist = computeHist(cv2.imread(imageFile))
+    hist = computeHist(cv2.imread(currentImage))
     plt.plot(hist)
     plt.xlabel('Gray level')
     plt.ylabel('Count')
     plt.title("Histogram of the image in gray level")
     plt.show()
+
+
+def saveImage():
+    global currentImage
+
+    if currentImage:
+        imageName = currentImage.split("/")[-1]
+        cv2.imwrite(imageName, currentImage)
+    else:
+        saveAsImage()
+
+
+def saveAsImage():
+    global currentImage
+
+    imageName = filedialog.asksaveasfilename(defaultextension=".png", initialdir="~/Pictures/", title="Save an image", filetypes=(("JPG files", "*.jpg"), ("PNG files", "*.png")))
+
+    if imageName:
+        imageName = imageName.split("/")[-1]
+        cv2.imwrite(imageName, currentImage)
+
+
+def closeImage():
+    global label
+    label.pack_forget()
+    label = Label(text="Select an image...", anchor=CENTER)
+    label.pack()
 
 
 root = Tk()
@@ -144,16 +187,17 @@ menubar = Menu(root)
 
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Open", command=openImage)
-filemenu.add_command(label="Save", command=donothing)
-filemenu.add_command(label="Close", command=donothing)
+filemenu.add_command(label="Save", command=saveImage)
+filemenu.add_command(label="Save as", command=saveAsImage)
+filemenu.add_command(label="Close", command=closeImage)
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=root.quit)
 
 menubar.add_cascade(label="File", menu=filemenu)
 
 editmenu = Menu(menubar, tearoff=0)
-editmenu.add_command(label="Undo", command=donothing)
-editmenu.add_command(label="Redo", command=donothing)
+editmenu.add_command(label="Undo", command=label.edit_undo)
+editmenu.add_command(label="Redo", command=label.edit_redo)
 
 menubar.add_cascade(label="Edit", menu=editmenu)
 
@@ -178,7 +222,7 @@ helpmenu.add_command(label="About", command=donothing)
 
 menubar.add_cascade(label="Help", menu=helpmenu)
 
-label = Label(root, text="Select an image...", anchor=CENTER)
+label = Label(root, text="Select an image...", anchor=CENTER, undo=True)
 label.pack()
 
 root.config(menu=menubar)
