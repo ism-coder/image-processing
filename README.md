@@ -1,9 +1,9 @@
-#############################################################
-Nom: AIVO                                                    
-Auteurs: HARRIS Maïla Salimo, RAKOTONIRINA Celin, MAMORISOA Jean Rangomana, Iavotra, Dierlaz, Givano  
-Description: outils de traitement d'image  
-Version: 1.0
-#############################################################
+######################################################################################################
+Nom: AIVO                                                                                            #
+Auteurs: HARRIS Maïla Salimo, RAKOTONIRINA Celin, MAMORISOA Jean Rangomana, Iavotra, Dierlaz, Givano #
+Description: outils de traitement d'image                                                            #
+Version: 1.0                                                                                         #
+######################################################################################################
 
 # Traitement d'image
 Ce projet est une petite application de traitement d'image. Elle ne contient que quelques fonctionnalites de bases dans le traitement d'image.
@@ -22,3 +22,17 @@ Ces modules sont mentionnes dans le fichier REQUIREMENTS.txt sauf le module open
 Pour le test nous avons utilise "Lena.png" contenu dans le dossier /source/image/
 
 ## Installation
+### Cloner le repository
+  git clone https://github.com/ism-coder/image-processing.git
+
+### Installer les prerequis
+- Sous Windows:
+  pip install < REQUIREMENTS.txt
+- Sous Linux:
+  pip3 install < REQUIREMENTS.txt
+  
+### Executer le fichier main.py
+- Sous Windows:
+  python main.py
+- Sous Linux:
+  python3 main.py
