@@ -161,6 +161,26 @@ def erosion(bin_image):
     return image1
 
 
+def opening(image):
+    bin_image = binarize(image, 128)
+    return dilatation(erosion(bin_image))
+
+
+def closing(image):
+    bin_image = binarize(image, 128)
+    return erosion(dilatation(bin_image))
+
+
+def openingTopHat(image):
+    bin_image = binarize(image, 128)
+    return bin_image - opening(bin_image)
+
+
+def closingTopHat(image):
+    bin_image = binarize(image, 128)
+    return closing(bin_image) - bin_image
+
+
 def edge(image):
     bin_image = binarize(image, 128)
     image1 = dilatation(bin_image)
