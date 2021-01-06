@@ -173,12 +173,12 @@ def closing(image):
 
 def openingTopHat(image):
     bin_image = binarize(image, 128)
-    return bin_image - opening(bin_image)
+    return bin_image - opening(image)
 
 
 def closingTopHat(image):
     bin_image = binarize(image, 128)
-    return closing(bin_image) - bin_image
+    return closing(image) - bin_image
 
 
 def edge(image):
